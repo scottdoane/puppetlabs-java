@@ -11,6 +11,12 @@
 # which Java alternative is enabled, we hard code the path to bin/java
 # for the config class to test if it is enabled.
 class java::params {
+  if $::java_override {
+    $java = {
+      'jdk' => { 'package' => $::java_jdk_package, },
+      'jre' => { 'package' => $::java_jre_package, },
+    }
+  } else {
 
   case $::osfamily {
     'RedHat': {
@@ -23,6 +29,10 @@ class java::params {
           elsif (versioncmp($::operatingsystemrelease, '6.3') < 0) {
             $jdk_package = 'java-1.6.0-openjdk-devel'
             $jre_package = 'java-1.6.0-openjdk'
+          }
+          elsif (versioncmp($::operatingsystemrelease, '7.0') < 0) {
+            $jdk_package = 'java-1.8.0-openjdk-devel'
+            $jre_package = 'java-1.8.0-openjdk'
           }
           else {
             $jdk_package = 'java-1.7.0-openjdk-devel'
@@ -168,5 +178,6 @@ class java::params {
       }
     }
     default: { fail("unsupported platform ${::osfamily}") }
+  }
   }
 }
